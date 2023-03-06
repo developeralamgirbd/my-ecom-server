@@ -1,4 +1,5 @@
 const Category = require('../../models/category/Category');
+const SubCategoryModel = require('../../models/category/SubCategory');
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -8,7 +9,7 @@ exports.categoryCreateService = async (name, userID)=>{
     return category;
 }
 
-exports.showCategoriesService = async ()=>{
+/*exports.showCategoriesService = async ()=>{
     return Category.aggregate([
         {$facet: {
            totalCategory: [
@@ -20,7 +21,7 @@ exports.showCategoriesService = async ()=>{
            ]
         }},
     ]);
-}
+}*/
 
 exports.categoryFindByName = async (name)=>{
     return Category.aggregate([
@@ -42,6 +43,24 @@ exports.categoryUpdateService = async (_id, authorID, name)=>{
 
 exports.categoryDeleteService = async (authorID, _id)=>{
     return Category.deleteOne({authorID:  ObjectId(authorID), _id: ObjectId(_id)});
+}
+
+// {$facet: {
+//     totalCategory: [
+//         {$group: {_id:0, count: {$sum: 1}}},
+//         {$project: {'_id':0}}
+//     ],
+//         categories: [
+//         {$project: {_id:1, name:1, authorID:1, status:1, createdAt:1, updatedAt:1 }}
+//     ]
+// }},
+exports.showCategoriesService = async ()=>{
+    const data = await Category.aggregate([
+        {$lookup: {from: 'subcategories', localField: '_id', foreignField: 'parentID', as: 'subCategory'}},
+    ]);
+    console.log(data)
+    return data
+
 }
 
 

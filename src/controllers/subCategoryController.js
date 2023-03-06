@@ -1,6 +1,9 @@
 const CategoryModel = require('../models/category/Category');
+const SubCategoryModel = require('../models/category/SubCategory');
 const PostModel = require('../models/product/Product');
 const mongoose = require('mongoose');
+const {error} = require('../utils/error');
+const ObjectId = mongoose.Types.ObjectId;
 
 const {checkAssociateService} = require("../services/common/checkAssociateService");
 
@@ -11,34 +14,48 @@ const {showCategoriesService,
     categoryCreateService,
     categoryDeleteService} = require("../services/categoryService/categoryService");
 const getByIdService = require("../services/common/getByIdService");
+const createService = require("../services/common/createService");
 
-exports.postCategory = async (req, res)=>{
+exports.postSubCategory = async (req, res, next)=>{
     try {
-        const {name} = req.body;
+        const {name, parentID} = req.body;
         const userID = req.auth._id;
 
-       const findCategory = await getByIdService({name}, CategoryModel);
+       const findCategory = await getByIdService({name: name.toLowerCase()}, SubCategoryModel);
+        // console.log(findCategory)
 
-       if (findCategory){
-          return res.status(400).json({
-               status: 'fail',
-               error: 'Category already created',
-           });
+       if (findCategory) {
+           return res.status(400).json({error: 'Category already created'})
        }
 
-        const category = await categoryCreateService(name, userID);
+       const createObj = {name, parentID, userID}
+        const subCategory = await createService(createObj, SubCategoryModel);
         res.status(200).json({
-            status: 'success',
-            message: 'Successfully created category',
-            data: category
+            subCategory
         });
 
     }catch (error) {
-        console.log(error);
-        res.status(500).json({
-            status: 'fail',
-            error: 'Server error occurred'
+        console.log(error)
+        res.status(500).json({error: 'Server error occurred'})
+    }
+
+};
+
+exports.postSubCategoryChild = async (req, res, next)=>{
+    try {
+        const {name, id} = req.body;
+
+      const children = await SubCategoryModel.updateOne({_id: ObjectId(id)}, {
+            $addToSet: {children: name}
+        }, {upsert: true})
+
+        res.status(200).json({
+            children
         });
+
+    }catch (error) {
+        console.log(error)
+        res.status(500).json({error: 'Server error occurred'})
     }
 
 };
@@ -48,12 +65,12 @@ exports.showCategory = async (req, res)=>{
 
         const categories = await showCategoriesService();
 
-        // if (!categories[0]){
-        //    return res.status(400).json({
-        //         status: 'fail',
-        //         message: 'Category not found',
-        //     });
-        // }
+        if (!categories[0]){
+           return res.status(400).json({
+                status: 'fail',
+                message: 'Category not found',
+            });
+        }
 
         res.status(200).json({
             status: 'success',
