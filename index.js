@@ -27,7 +27,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.get('/', (req, res)=>{
-	res.status(200).send('Welcome to MY ECOM Server Visit Our WebSite: https://my-ecom-client.vercel.app');
+	res.status(200).send('Welcome to MY ECOM Server Visit Our WebSite: <a href=https://my-ecom-client.vercel.app>MY ECOM</a>');
 })
 app.get('/health', (req, res)=>{
 	res.status(200).json({
