@@ -1,0 +1,4 @@
+Deploy Client URL = https://my-ecom-client.vercel.app
+GitHub Client Repository URL = https://github.com/developeralamgirbd/my-ecom-client
+
+Deploy Server URL = https://my-ecom-server.vercel.app
