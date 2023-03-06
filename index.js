@@ -26,7 +26,14 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-		
+app.get('/', (req, res)=>{
+	res.status(200).send('Welcome to MY ECOM');
+})
+app.get('/health', (req, res)=>{
+	res.status(200).json({
+		connection: 'OK'
+	});
+})
 		
 // Router
 readdirSync('./src/routes').map(r => app.use('/api/v1', require(`./src/routes/${r}`)));
