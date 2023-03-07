@@ -39,7 +39,14 @@ const productSchema = new Schema({
     categoryID: {
             type: Schema.Types.ObjectId,
             ref: 'Category'
-        }
+        },
+    subCategoryID: {
+        type: Schema.Types.ObjectId,
+        ref: 'SubCategory'
+    },
+    categoryName: {
+        type: String
+    }
 
 }, {versionKey: false, timestamps: true});
 
