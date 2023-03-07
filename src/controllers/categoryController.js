@@ -192,6 +192,7 @@ const getByIdService = require("../services/common/getByIdService");
 const getByPropertyService = require("../services/common/getByPropertyService");
 const createService = require("../services/common/createService");
 const {updateService} = require("../services/common/updateService");
+const {showCategoriesService} = require("../services/categoryService/categoryService");
 
 exports.postCategory= async (req, res)=>{
     try {
@@ -231,7 +232,7 @@ exports.getCategories = async (req, res)=>{
     }catch (error) {
         console.log(error);
         res.status(500).json({
-            error: 'Server error occurred'
+            error: error.toString()
         });
     }
 }
