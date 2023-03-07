@@ -232,7 +232,7 @@ exports.getCategories = async (req, res)=>{
     }catch (error) {
         console.log(error);
         res.status(500).json({
-            error: error.toString()
+            error: 'Server error occurred'
         });
     }
 }
