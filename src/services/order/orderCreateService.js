@@ -83,7 +83,7 @@ exports.orderCreateService =  async (nonce, products, gateway, user, shippingAdd
             const shippingAddress = await ShippingAddressModel.updateOne({userID: ObjectId(user?._id)},{
                 userID: user?._id,
                 name: shippingAddressObj?.name || `${user.firstName} ${user.lastName}`,
-                address: shippingAddressObj?.name || userAddress?.address,
+                address: shippingAddressObj?.address || userAddress?.address,
                 city: shippingAddressObj?.city || userAddress?.city,
                 state: shippingAddressObj?.state || userAddress?.state,
                 country: shippingAddressObj?.country || userAddress?.country,

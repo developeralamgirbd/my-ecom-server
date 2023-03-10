@@ -26,10 +26,12 @@ exports.createBraintreeToken = async (_req, res, next)=>{
 exports.checkout = async (req, res, next)=>{
     try {
 
-        const {nonce, cart} = req.body;
+        const {nonce, cart, shippingAddress} = req.body;
         const user = req?.auth;
         const products = await productValidityService(cart);
-       const result = await orderCreateService(nonce, products, gateway, user);
+        console.log(shippingAddress)
+
+       const result = await orderCreateService(nonce, products, gateway, user, shippingAddress);
         res.status(200).json(result)
 
     }catch (e) {

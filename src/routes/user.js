@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const {register, login, profile, profileUpdate, passwordUpdate, verifyOTP, sendOTP, resetPassword} = require('../controllers/userController');
+const {register, login, profile, profileUpdate, passwordUpdate, verifyOTP, sendOTP, resetPassword, address} = require('../controllers/userController');
 const {AuthVerifyMiddleware, isSuperAdmin} = require("../middleware/AuthVerifyMiddleware");
 
 
@@ -13,7 +13,7 @@ router.get('/users/:email', sendOTP);
 router.patch('/users/:email/:otp', resetPassword);
 
 router.get('/users', AuthVerifyMiddleware, profile);
-
+router.get('/address', AuthVerifyMiddleware, address);
 router.patch('/users/p', AuthVerifyMiddleware, profileUpdate);
 router.patch('/users', AuthVerifyMiddleware, passwordUpdate);
 

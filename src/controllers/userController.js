@@ -9,7 +9,8 @@ const {
 	userDetailsService,
 	userFindByEmailService,
 	userProfileUpdateService,
-	passwordUpdateService }  = require('../services/userService/userService');
+	passwordUpdateService, userAddressService
+}  = require('../services/userService/userService');
 const sendEmail = require("../helper/sendEmail");
 
 exports.register = async (req, res)=>{
@@ -308,6 +309,30 @@ exports.profileUpdate = async (req, res)=>{
 		});
 	}
 }
+
+exports.address = async (req, res)=>{
+	try {
+		const address = await userAddressService(req.auth?._id);
+
+		if (!address[0]){
+			return res.status(404).json({
+				status: 'fail',
+				error: 'Address not found'
+			});
+		}
+
+		res.status(200).json({
+			address
+		})
+
+	}catch (error) {
+		console.log(error)
+		res.status(500).json({
+			status: 'fail',
+			error: 'Server error occurred'
+		})
+	}
+};
 
 exports.passwordUpdate = async (req, res)=>{
 	try {

@@ -1,4 +1,5 @@
 const User = require('../../models/user/User');
+const Address = require('../../models/user/Address');
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -16,15 +17,11 @@ exports.userDetailsService = async (email)=>{
 	] );
 };
 
-
-
 exports.userFindByEmailService = async (email)=>{
 	return User.aggregate(  [
 		{$match: {email } }
 	] );
 };
-
-
 
 exports.passwordUpdateService = async (email, hashPassword)=>{
 	const user = await User.updateOne(
@@ -42,6 +39,12 @@ exports.userProfileUpdateService = async (_id, firstName, lastName)=>{
 			 firstName,
 			 lastName,
 		 }}, {runValidators: true});
+}
+
+exports.userAddressService = async (userID)=>{
+	return Address.aggregate([
+		{$match: {userID: ObjectId(userID)}}
+	])
 }
 
 
