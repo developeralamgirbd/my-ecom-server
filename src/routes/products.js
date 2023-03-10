@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const formidable = require('express-formidable');
 
 const {create, authShowAllPost, updatePost, showPostByCategory, showPostByStatus, authSearchPosts, deletePost, searchPosts,
     showSinglePost, authShowPostByCategory,
@@ -8,7 +9,8 @@ const {create, authShowAllPost, updatePost, showPostByCategory, showPostByStatus
     getProducts,
     getProductById,
     createBraintreeToken,
-    checkout
+    checkout,
+    getByCategory
 } = require('../controllers/productController');
 const {AuthVerifyMiddleware, isSuperAdmin} = require("../middleware/AuthVerifyMiddleware");
 
@@ -18,7 +20,7 @@ router.post('/products', AuthVerifyMiddleware, isSuperAdmin, postProduct);
 router.get('/posts/auth/s/:keyword', AuthVerifyMiddleware, authSearchPosts);
 router.get('/posts/search/:keyword/:page', searchPosts);
 router.get('/posts/auth/c/:name', AuthVerifyMiddleware, authShowPostByCategory);
-router.get('/posts/category/:name/:page', showPostByCategory);
+router.get('/products/category/:name/:page/:perpage', getByCategory);
 
 router.get('/products/:page/:perpage/list', getProducts);
 router.get('/products/:id', getProductById);

@@ -186,7 +186,7 @@ exports.deleteCategory = async (req, res)=>{
 exports.postSubCategory = async (req, res, next)=>{
     try {
         const {name, parentID} = req.body;
-        const userID = req.auth._id;
+        const authorID = req.auth._id;
 
         const isMatch = await getByPropertyService({name: name.toLowerCase()}, SubCategoryModel);
 
@@ -194,7 +194,7 @@ exports.postSubCategory = async (req, res, next)=>{
             return res.status(400).json({error: 'Sub Category already exits'})
         }
 
-        const createObj = {name, parentID, userID}
+        const createObj = {name, parentID, authorID}
         const subCategory = await createService(createObj, SubCategoryModel);
         res.status(200).json({
             subCategory
@@ -213,9 +213,11 @@ exports.patchSubCategory = async (req, res)=>{
         const id = req.params?.id;
         const authorID = req.auth?._id;
 
+
         const category = await getByIdService(id, SubCategoryModel);
 
         const categoryName = req.body?.name !== '' ? req.body?.name : category?.name;
+
 
         const isMatch = await getByPropertyService({_id: {$ne: ObjectId(id)}, name: categoryName.toLowerCase()}, SubCategoryModel);
 
@@ -240,7 +242,7 @@ exports.postSubCategoryChild = async (req, res, next)=>{
     try {
         const {name, id, index} = req.body;
         const key = `children.${index}`;
-        const update = index === undefined ? {$addToSet: {children: name}} : {$set: {[key]: name}};
+        const update = index === null ? {$addToSet: {children: name}} : {$set: {[key]: name}};
 
         const children = await SubCategoryModel.updateOne({_id: ObjectId(id)}, update, {upsert: true})
         res.status(200).json({

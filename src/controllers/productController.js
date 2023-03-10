@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const CategoryModel = require('../models/category/Category');
 const {categoryFindByID, categoryFindByName} = require("../services/categoryService/categoryService");
+const multer = require('multer');
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -11,7 +12,7 @@ const {
     showPostByCategoryService,
     postUpdateService,
     postDeleteService, postByID, authShowAllPostService, productCreateService, showAllProductsService,
-    listProductsService, getProductByIdService
+    listProductsService, getProductByIdService, showProductByCategoryService
 }
     = require('../services/productService/productService');
 const getByIdService = require("../services/common/getByIdService");
@@ -21,26 +22,21 @@ const getByIdService = require("../services/common/getByIdService");
 
 exports.postProduct = async (req, res)=>{
     try {
-        console.log(req.body);
+        const {name, description, price, quantity, sold, category, brandID, image} = req.body;
 
-        const {name, description, price, quantity, sold, categoryID } = req.body;
         const userID = req.auth?._id
-        const isExit = await getByIdService({_id: ObjectId(categoryID)}, CategoryModel);
 
-        if (!isExit){
-            return res.status(400).json({
-                status: 'fail',
-                message: 'Category not found'
-            });
-        }
-
-        const productBody = {name, description, price, quantity, sold, categoryID, userID};
+        const productBody = {name, description, price, quantity, sold, category, userID, brandID, image};
+        // console.log(productBody);
 
         const product = await productCreateService(productBody);
 
         res.status(200).json({
             product
         });
+
+
+
 
     }catch (error) {
         console.log(error);
@@ -67,7 +63,7 @@ exports.authShowAllPost = async (req, res)=>{
 
         res.status(200).json({
             status: 'success',
-            message: 'Successfully get all post',
+            message: 'Successfully get all product',
             data: post[0]
         });
 
@@ -129,7 +125,7 @@ exports.updatePost = async (req, res)=>{
             categoryID: categoryID !== '' ? categoryID : findPost[0].categoryID
         };
 
-        // only update logged user post, not allow other person post update
+        // only update logged user product, not allow other person product update
         const data = await postUpdateService(_id, authorID, updateBody);
 
         if (!data){
@@ -252,30 +248,30 @@ exports.authShowPostByCategory = async (req, res)=>{
     }
 }
 
-exports.showPostByCategory = async (req, res)=>{
+exports.getByCategory = async (req, res)=>{
     try {
-        const perPage = 6;
-        const page = req.params?.page ? req.params?.page : 1;
         const categoryName =  req.params.name.toLowerCase();
+        const page = req.params?.page ? Number(req.params?.page) : 1;
+        const perPage = Number(req.params?.perpage);
 
-        const isCategory = await categoryFindByName(categoryName);
+        // const isCategory = await categoryFindByName(categoryName);
+        //
+        // if (!isCategory[0]){
+        //     return res.status(400).json({
+        //         status: 'fail',
+        //         error: 'Category not found'
+        //     });
+        // }
 
-        if (!isCategory[0]){
-            return res.status(400).json({
-                status: 'fail',
-                error: 'Category not found'
-            });
-        }
-        const ObjectId = mongoose.Types.ObjectId;
-        const query = {categoryID: ObjectId(isCategory[0]['_id'])}
+        // const ObjectId = mongoose.Types.ObjectId;
+        // const query = {categoryID: ObjectId(isCategory[0]['_id'])}
+        const query = {category: categoryName}
 
-        // const post = await showPostByCategoryService(query);
-        const post = await showAllPostService(query, page, perPage);
+        // const product = await showPostByCategoryService(query);
+        const products = await showProductByCategoryService(query, page, perPage);
 
         res.status(200).json({
-            status: 'Success',
-            message: `Post show by ${categoryName} category successfully`,
-            data: post
+            products
         })
 
     }catch (error) {

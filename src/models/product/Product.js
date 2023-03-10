@@ -1,5 +1,6 @@
 const {Schema, model} = require('mongoose');
 const slugify = require("slugify");
+const buffer = require("buffer");
 
 const productSchema = new Schema({
     name: {
@@ -36,9 +37,14 @@ const productSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'User'
         },
-    categoryID: {
+    category: [
+        {
+            type: String,
+        }
+    ],
+    brandID: {
             type: Schema.Types.ObjectId,
-            ref: 'Category'
+            ref: 'Brand'
         },
     subCategoryID: {
         type: Schema.Types.ObjectId,
@@ -46,6 +52,9 @@ const productSchema = new Schema({
     },
     categoryName: {
         type: String
+    },
+    image: {
+        type: String,
     }
 
 }, {versionKey: false, timestamps: true});

@@ -1,12 +1,17 @@
 const mongoose = require("mongoose");
+const fs = require('fs');
 const Product = require("../../models/product/Product");
 const { error } = require("../../utils/error");
 const ObjectId = mongoose.Types.ObjectId;
 
-exports.productCreateService = async (productBody)=>{
-	const category = new Product(productBody);
-	await category.save();
-	return category;
+exports.productCreateService = async (productBody, )=>{
+	const product = new Product(productBody);
+	// if (image) {
+	// 	product.image.data = fs.readFileSync(image.path);
+	// 	product.image.contentType = image.type;
+	// }
+	await product.save();
+	return product;
 }
 
 exports.authShowAllProductService = async (authorID)=>{
@@ -59,12 +64,6 @@ exports.listProductsService = async (page, perPage)=>{
 
 	const data = await Product.aggregate([
 		{$match: {}},
-		{$lookup: {
-				from: 'categories',
-				localField: 'categoryID',
-				foreignField: '_id',
-				as: 'category'
-			}},
 
 		{$facet: {
 				totalProduct: [
@@ -81,7 +80,8 @@ exports.listProductsService = async (page, perPage)=>{
 							sold: 1,
 							createdAt: 1,
 							updatedAt: 1,
-							categoryName: {$first: "$category.name"},
+							category: 1,
+							image: 1
 						}
 					},
 
@@ -94,44 +94,40 @@ exports.listProductsService = async (page, perPage)=>{
 
 	])
 
-	return {total: data[0]['totalProduct'][0]['count'], rows: data[0]['rows']}
+	return {total: data[0]?.totalProduct[0]?.count || 0, rows: data[0]['rows']}
 }
 
-exports.showProductByCategoryService = async (query)=>{
+exports.showProductByCategoryService = async (query, page, perPage)=>{
 
 	return Product.aggregate([
 		{
 			$match: query
 		},
 
-		{$lookup: {
-				from: 'users',
-				localField: 'userID',
-				foreignField: '_id',
-				as: 'user'
-			}},
-		{$lookup: {
-				from: 'categories',
-				localField: 'categoryID',
-				foreignField: '_id',
-				as: 'category'
-			}},
-
 		{$facet: {
 				totalProduct: [
 					{$group: {_id:0, count: {$sum: 1}}},
 					{$project: {'_id': 0}}
 				],
-				posts: [
-					{$addFields: {
-							author: {$first: "$author"},
-						}},
+				rows: [
 
 					{$project: {
-							authorName: {$concat: ["$author.firstName", " ", '$author.lastName'] },
-							categoryName: {$first: "$category.name"},
+							name: 1,
+							description: 1,
+							price: 1,
+							quantity: 1,
+							sold: 1,
+							createdAt: 1,
+							updatedAt: 1,
+							category: 1,
+							image: 1
 						}
-					}
+					},
+
+
+					{$skip: (page - 1) * perPage},
+					{$limit: perPage},
+					{$sort: {createdAt: -1}}
 				]
 			}},
 	]);
@@ -183,10 +179,10 @@ exports.getProductByIdService = async (id)=>{
 	const data = await Product.aggregate([
 		{$match: { _id: ObjectId(id)}},
 		{$lookup: {
-				from: 'categories',
-				localField: 'categoryID',
+				from: 'brands',
+				localField: 'brandID',
 				foreignField: '_id',
-				as: 'category'
+				as: 'brand'
 			}},
 
 		{$project: {
@@ -197,7 +193,9 @@ exports.getProductByIdService = async (id)=>{
 				sold: 1,
 				createdAt: 1,
 				updatedAt: 1,
-				categoryName: {$first: "$category.name"},
+				category: 1,
+				brand: 1,
+				image: 1,
 			}
 		},
 
