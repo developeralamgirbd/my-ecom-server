@@ -240,3 +240,41 @@ exports.productValidityService = async (cart)=>{
 	 return cart;	
 }
 
+// Filtered Product
+exports.productFilterService = async (checked, radio)=>{
+	let args = {};
+	if (checked.length > 0) args.category = {$in: checked};
+	if (radio?.length) args.price = { $gte: radio[0], $lte: radio[1] };
+
+	const data = await Product.aggregate([
+		{$match: args},
+
+		{$facet: {
+				totalProduct: [
+					{$group: {_id:0, count: {$sum: 1}}},
+					{$project: {'_id': 0}}
+				],
+				rows: [
+
+					{$project: {
+							name: 1,
+							description: 1,
+							price: 1,
+							quantity: 1,
+							sold: 1,
+							createdAt: 1,
+							updatedAt: 1,
+							category: 1,
+							image: 1
+						}
+					},
+					{$limit: 12},
+				]
+			}},
+
+	])
+
+	return {total: data[0]?.totalProduct[0]?.count || 0, rows: data[0]['rows']}
+
+}
+

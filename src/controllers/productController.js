@@ -12,13 +12,10 @@ const {
     showPostByCategoryService,
     postUpdateService,
     postDeleteService, postByID, authShowAllPostService, productCreateService, showAllProductsService,
-    listProductsService, getProductByIdService, showProductByCategoryService
+    listProductsService, getProductByIdService, showProductByCategoryService, productFilterService
 }
     = require('../services/productService/productService');
 const getByIdService = require("../services/common/getByIdService");
-
-
-
 
 exports.postProduct = async (req, res)=>{
     try {
@@ -329,6 +326,23 @@ exports.deletePost = async (req, res)=>{
         });
     }
 }
+
+// Product Filter controller
+exports.filteredProducts = async (req, res) => {
+    try {
+
+        const { checked, radio } = req.body;
+
+        const products = await productFilterService(checked, radio);
+
+        res.status(200).json({
+            products
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({error: err.message});
+    }
+};
 
 
 

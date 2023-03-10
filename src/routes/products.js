@@ -10,7 +10,8 @@ const {create, authShowAllPost, updatePost, showPostByCategory, showPostByStatus
     getProductById,
     createBraintreeToken,
     checkout,
-    getByCategory
+    getByCategory,
+    filteredProducts
 } = require('../controllers/productController');
 const {AuthVerifyMiddleware, isSuperAdmin} = require("../middleware/AuthVerifyMiddleware");
 
@@ -21,6 +22,7 @@ router.get('/posts/auth/s/:keyword', AuthVerifyMiddleware, authSearchPosts);
 router.get('/posts/search/:keyword/:page', searchPosts);
 router.get('/posts/auth/c/:name', AuthVerifyMiddleware, authShowPostByCategory);
 router.get('/products/category/:name/:page/:perpage', getByCategory);
+router.post('/products/filtered', filteredProducts);
 
 router.get('/products/:page/:perpage/list', getProducts);
 router.get('/products/:id', getProductById);
