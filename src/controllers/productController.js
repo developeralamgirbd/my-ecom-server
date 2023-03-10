@@ -12,7 +12,7 @@ const {
     showPostByCategoryService,
     postUpdateService,
     postDeleteService, postByID, authShowAllPostService, productCreateService, showAllProductsService,
-    listProductsService, getProductByIdService, showProductByCategoryService, productFilterService
+    listProductsService, getProductByIdService, showProductByCategoryService, productFilterService, searchProductService
 }
     = require('../services/productService/productService');
 const getByIdService = require("../services/common/getByIdService");
@@ -179,20 +179,20 @@ exports.authSearchPosts = async (req, res)=>{
     }
 }
 
-exports.searchPosts = async (req, res)=>{
+exports.searchProducts = async (req, res)=>{
     try {
 
         const keyword = req.params?.keyword;
-        const perPage = 6;
-        const page = req.params?.page ? req.params?.page : 1;
+        const perPage = Number(req.params?.perpage) || 12;
+        const page = Number(req.params?.page) || 1;
 
-        const searchQuery = { title: {$regex: keyword, $options: "i" }};
+        const searchRegex = {$regex: keyword, $options: "i" };
+        const searchQuery = { $or: [{name: searchRegex}, {category: searchRegex}]};
 
-        const posts = await showAllPostService(searchQuery, page, perPage)
+        const products = await searchProductService(searchQuery, page, perPage)
 
         res.status(200).json({
-            status: 'Success',
-            data: posts
+            products
         })
 
     }catch (error) {

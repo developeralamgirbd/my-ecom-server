@@ -135,43 +135,38 @@ exports.showProductByCategoryService = async (query, page, perPage)=>{
 
 exports.searchProductService = async (searchQuery, page, perPage)=>{
 
-	 return Product.aggregate([
+	 const data = await Product.aggregate([
 		{$match: searchQuery},
-
-		 {$lookup: {
-				 from: 'users',
-				 localField: 'userID',
-				 foreignField: '_id',
-				 as: 'user'
-			 }},
-		 {$lookup: {
-				 from: 'categories',
-				 localField: 'categoryID',
-				 foreignField: '_id',
-				 as: 'user'
-			 }},
 
 		 {$facet: {
 				 totalProduct: [
 					 {$group: {_id:0, count: {$sum: 1}}},
 					 {$project: {'_id': 0}}
 				 ],
-				 posts: [
-					 {$addFields: {
-							 user: {$first: "$user"},
-						 }},
-
+				 rows: [
 					 {$project: {
-							 userName: {$concat: ["$user.firstName", " ", '$user.lastName'] },
-							 categoryName: {$first: "$category.name"},
+							 name: 1,
+							 description: 1,
+							 price: 1,
+							 quantity: 1,
+							 sold: 1,
+							 createdAt: 1,
+							 updatedAt: 1,
+							 category: 1,
+							 image: 1
 						 }
 					 },
+
+
 					 {$skip: (page - 1) * perPage},
 					 {$limit: perPage},
-					 {$sort: {createDate: -1}}
+					 {$sort: {createdAt: -1}}
 				 ]
 			 }},
 	]);
+
+
+	return {total: data[0]?.totalProduct[0]?.count || 0, rows: data[0]['rows']}
 }
 
 exports.getProductByIdService = async (id)=>{
