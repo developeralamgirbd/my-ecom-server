@@ -21,7 +21,7 @@ exports.postCategory= async (req, res)=>{
 
         const isMatch = await getByPropertyService({name}, CategoryModel);
 
-        if (isMatch){
+        if (isMatch.length > 0){
             return res.status(400).json({
                 error: 'Category already exit',
             });
@@ -126,7 +126,7 @@ exports.patchCategory = async (req, res)=>{
 
         const isMatch = await getByPropertyService({_id: {$ne: ObjectId(id)}, name: categoryName}, CategoryModel);
 
-        if (isMatch){
+        if (isMatch.length > 0){
             return res.status(400).json({
                 error: 'Category already exit',
             });
@@ -158,7 +158,7 @@ exports.deleteCategory = async (req, res)=>{
 
         const subCategory = getByPropertyService({parentID: ObjectId(id)}, SubCategoryModel);
         let CheckSubCategoryAssociate;
-        if (subCategory){
+        if (subCategory.length > 0){
             CheckSubCategoryAssociate = await checkAssociateService({subCategoryID: ObjectId(subCategory?._id)}, ProductModel);
         }
 
@@ -190,7 +190,7 @@ exports.postSubCategory = async (req, res, next)=>{
 
         const isMatch = await getByPropertyService({name: name.toLowerCase()}, SubCategoryModel);
 
-        if (isMatch) {
+        if (isMatch.length > 0) {
             return res.status(400).json({error: 'Sub Category already exits'})
         }
 
@@ -221,7 +221,7 @@ exports.patchSubCategory = async (req, res)=>{
 
         const isMatch = await getByPropertyService({_id: {$ne: ObjectId(id)}, name: categoryName.toLowerCase()}, SubCategoryModel);
 
-        if (isMatch) {
+        if (isMatch.length > 0) {
             return res.status(400).json({error: 'Sub Category already exits'})
         }
 

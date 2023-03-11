@@ -3,7 +3,7 @@ const getByPropertyService = async (query, Model)=>{
         {$match: query}
     ]);
 
-    return data[0]
+    return data
 }
 
 module.exports = getByPropertyService;

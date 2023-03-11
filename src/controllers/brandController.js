@@ -17,7 +17,7 @@ exports.postBrand= async (req, res)=>{
 
        const isMatch = await getByPropertyService({name}, BrandModel);
 
-       if (isMatch){
+       if (isMatch.length > 0){
           return res.status(400).json({
                error: 'Brand already exit',
            });

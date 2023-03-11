@@ -8,10 +8,13 @@ const gateway = new braintree.BraintreeGateway({
     publicKey: process.env.BRAINTREE_PUBLIC_KEY,
     privateKey: process.env.BRAINTREE_PRIVATE_KEY
 });
-
+const mongoose = require('mongoose');
+const OrderModel = require('../models/order/Order');
 const {orderCreateService} = require("../services/order/orderCreateService");
 const {productValidityService} = require("../services/productService/productService");
 const { error } = require("../utils/error");
+const getByPropertyService = require("../services/common/getByPropertyService");
+const ObjectId = mongoose.Types.ObjectId;
 
 exports.createBraintreeToken = async (_req, res, next)=>{
     try {
@@ -36,5 +39,19 @@ exports.checkout = async (req, res, next)=>{
 
     }catch (e) {
         next(e)
+    }
+}
+
+// Customer Controller
+exports.getOrders = async (req, res, next)=>{
+    try {
+        const userID = req.auth._id;
+        const orders = await getByPropertyService({userID: ObjectId(userID)}, OrderModel);
+        res.status(200).json({
+            orders
+        })
+
+    }catch (e) {
+     next(e)
     }
 }

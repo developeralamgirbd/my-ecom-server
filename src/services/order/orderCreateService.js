@@ -8,7 +8,7 @@ const AddressModel = require('../../models/user/Address');
 const { error } = require('../../utils/error');
 
 const ObjectId = mongoose.Types.ObjectId;
-
+// Customer Services
 exports.orderCreateService =  async (nonce, products, gateway, user, shippingAddressObj)=>{
     	const session = await mongoose.startSession();
         await session.startTransaction();
@@ -119,3 +119,5 @@ exports.orderCreateService =  async (nonce, products, gateway, user, shippingAdd
 
         }
 }
+
+
