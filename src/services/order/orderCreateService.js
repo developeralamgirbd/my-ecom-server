@@ -120,6 +120,25 @@ exports.orderCreateService =  async (nonce, products, gateway, user, shippingAdd
         }
 }
 
+exports.getOrderDetailsService = async (orderID)=>{
+  const data = await OrderItemModel.aggregate([
+        {$match: {orderID: ObjectId(orderID)}},
+        {$facet: {
+            subtotal: [
+                {$group: {_id: null, amount: { $sum: { $multiply: [ "$quantity", "$price" ] }}}}
+            ],
+          rows: [
+              {$lookup: {from: 'products', foreignField: '_id', localField: 'productID', as: 'products'}},
+              {$unwind: '$products'},
+              {$project: {_id: 1, price: 1, quantity: 1, createdAt: 1, 'products._id': 1, 'products.name': 1, 'products.image': 1}}
+          ]
+          }},
 
+    ])
+    // console.log(data[0].subTotal)
+
+    return {subtotal: data[0]?.subtotal[0]?.amount, rows: data[0]?.rows}
+
+}
 
 

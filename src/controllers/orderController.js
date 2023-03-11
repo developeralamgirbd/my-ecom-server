@@ -12,7 +12,7 @@ const mongoose = require('mongoose');
 const OrderModel = require('../models/order/Order');
 const OrderItemModel = require('../models/order/OrderItem');
 const ShippingAddressModel = require('../models/order/ShippingAddress');
-const {orderCreateService, orderDetailsService} = require("../services/order/orderCreateService");
+const {orderCreateService, orderDetailsService, getOrderDetailsService} = require("../services/order/orderCreateService");
 const {productValidityService} = require("../services/productService/productService");
 const { error } = require("../utils/error");
 const getByPropertyService = require("../services/common/getByPropertyService");
@@ -62,14 +62,17 @@ exports.getOrderDetails = async (req, res, next)=>{
     try {
         const userID = req.auth._id;
         const orderID = req.params.id;
-        const orders = await getByPropertyService({orderID: ObjectId(orderID)}, OrderItemModel);
+        const orderDetails = await getOrderDetailsService(orderID);
+        const orders = await getByPropertyService({_id: ObjectId(orderID)}, OrderModel);
         const shippingAddress = await getByPropertyService({orderID: ObjectId(orderID)}, ShippingAddressModel);
         res.status(200).json({
+            orderDetails,
             orders,
             shippingAddress
         })
 
     }catch (e) {
+        console.log(e)
         next(e)
     }
 }

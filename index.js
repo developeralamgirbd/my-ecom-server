@@ -38,9 +38,10 @@ app.get('/health', (req, res)=>{
 // Router
 readdirSync('./src/routes').map(r => app.use('/api/v1', require(`./src/routes/${r}`)));
 
-app.use((err, req, res, nex)=>{
+app.use((err, req, res, next)=>{
+
 	res.status(err.status ? err.status : 500).json({
-		error: err.message ? err.message : 'Something went worng'
+		error: 'Something went wrong'
 	})
 })
 
