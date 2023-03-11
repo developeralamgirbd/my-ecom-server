@@ -47,9 +47,9 @@ exports.orderCreateService =  async (nonce, products, gateway, user, shippingAdd
 
             // 1st DB Process Order create
             let orderID = 1;
-            const order = OrderModel.find().sort({createdAt: -1}).limit(1);
-            if (order.orderID){
-                orderID += order.orderID + 1
+            const order = await OrderModel.find().sort({createdAt: -1}).limit(1);
+            if (order.length > 0){
+                orderID = order[0]?.orderID + 1
             }
 
             const newOrder = new OrderModel({
@@ -60,6 +60,8 @@ exports.orderCreateService =  async (nonce, products, gateway, user, shippingAdd
             });
 
             await newOrder.save(options);
+            // console.log(newOrder)
+
 
             // 2nd DB Process Order Items create
 
@@ -80,7 +82,8 @@ exports.orderCreateService =  async (nonce, products, gateway, user, shippingAdd
             // 3rd DB Process Shipping Address create
             const userAddress = await AddressModel.findOne({userID: ObjectId(user?._id)});
 
-            const shippingAddress = await ShippingAddressModel.updateOne({userID: ObjectId(user?._id)},{
+            const shippingAddress = new ShippingAddressModel({
+                orderID: newOrder._id,
                 userID: user?._id,
                 name: shippingAddressObj?.name || `${user.firstName} ${user.lastName}`,
                 address: shippingAddressObj?.address || userAddress?.address,
@@ -89,7 +92,9 @@ exports.orderCreateService =  async (nonce, products, gateway, user, shippingAdd
                 country: shippingAddressObj?.country || userAddress?.country,
                 zipCode: shippingAddressObj?.zipCode || userAddress?.zipCode,
                 mobile: shippingAddressObj?.mobile || user?.mobile,
-            }, {upsert: true, ...options});
+            });
+            await shippingAddress.save(options);
+
 
             // 4th DB Process Payment create
 

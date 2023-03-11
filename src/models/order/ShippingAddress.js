@@ -1,6 +1,10 @@
 const {Schema, model} = require('mongoose');
 
 const shippingAddressSchema = new Schema({
+    orderID:{
+        type: Schema.Types.ObjectId,
+        ref: 'Order'
+    },
     userID:{
         type: Schema.Types.ObjectId,
         ref: 'User'
