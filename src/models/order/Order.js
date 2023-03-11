@@ -15,7 +15,7 @@ const orderSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['onhold', 'processing', "pendingpayment", "failed", "completed", "cancelled", "refunded"],
+        enum: ['onhold', 'processing', "pendingpayment", "failed", "delivered", "cancelled", "refunded"],
         default: 'onhold'
     },
     paymentStatus: {
@@ -23,7 +23,7 @@ const orderSchema = new Schema({
         enum: ['unpaid', 'paid'],
         default: 'unpaid'
     }
-});
+}, {versionKey: false, timestamps: true});
 
 const Order = model('Order', orderSchema);
 

@@ -10,7 +10,9 @@ const gateway = new braintree.BraintreeGateway({
 });
 const mongoose = require('mongoose');
 const OrderModel = require('../models/order/Order');
-const {orderCreateService} = require("../services/order/orderCreateService");
+const OrderItemModel = require('../models/order/OrderItem');
+const ShippingAddressModel = require('../models/order/ShippingAddress');
+const {orderCreateService, orderDetailsService} = require("../services/order/orderCreateService");
 const {productValidityService} = require("../services/productService/productService");
 const { error } = require("../utils/error");
 const getByPropertyService = require("../services/common/getByPropertyService");
@@ -53,5 +55,21 @@ exports.getOrders = async (req, res, next)=>{
 
     }catch (e) {
      next(e)
+    }
+}
+
+exports.getOrderDetails = async (req, res, next)=>{
+    try {
+        const userID = req.auth._id;
+        const orderID = req.params.id;
+        const orders = await getByPropertyService({orderID: ObjectId(orderID)}, OrderItemModel);
+        const shippingAddress = await getByPropertyService({orderID: ObjectId(orderID)}, ShippingAddressModel);
+        res.status(200).json({
+            orders,
+            shippingAddress
+        })
+
+    }catch (e) {
+        next(e)
     }
 }
