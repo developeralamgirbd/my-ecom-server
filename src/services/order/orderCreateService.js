@@ -6,6 +6,7 @@ const ShippingAddressModel = require('../../models/order/ShippingAddress');
 const ProductModel = require('../../models/product/Product');
 const AddressModel = require('../../models/user/Address');
 const { error } = require('../../utils/error');
+const Product = require("../../models/product/Product");
 
 const ObjectId = mongoose.Types.ObjectId;
 // Customer Services
@@ -77,7 +78,6 @@ exports.orderCreateService =  async (nonce, products, gateway, user, shippingAdd
 
             // console.log(orderItems)
 
-
             const newOrderItems = await OrderItemModel.insertMany(orderItems, options);
 
             // 3rd DB Process Shipping Address create
@@ -95,6 +95,19 @@ exports.orderCreateService =  async (nonce, products, gateway, user, shippingAdd
                 mobile: shippingAddressObj?.mobile || user?.mobile,
             });
             await shippingAddress.save(options);
+
+            const ids = products.reduce((accumulator, current)=>{
+                return [...accumulator, ObjectId(current._id)]
+            }, [])
+
+            // const products = await Product.updateMany({_id: {$in: ids}}, {
+            //     quantity:
+            // })
+
+           products.map( async product => {
+                await ProductModel.findByIdAndUpdate(product._id, { $inc: { quantity: -product.count, sold: product.count } }, {options})
+            })
+
 
 
             // 4th DB Process Payment create
