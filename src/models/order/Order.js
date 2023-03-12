@@ -6,8 +6,7 @@ const orderSchema = new Schema({
         ref: 'User'
     },
     orderID: {
-        type: Number,
-        unique: true
+        type: Date,
     },
     totalAmount: {
         type: Number,

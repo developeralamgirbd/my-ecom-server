@@ -51,10 +51,11 @@ exports.orderCreateService =  async (nonce, products, gateway, user, shippingAdd
             if (order.length > 0){
                 orderID = order[0]?.orderID + 1
             }
+            // console.log(orderID)
 
             const newOrder = new OrderModel({
                 userID: user._id,
-                orderID: orderID,
+                orderID: new Date(),
                 totalAmount: newTransaction.transaction.amount,
                 paymentStatus: newTransaction?.success ? 'paid' : 'unpaid',
             });
